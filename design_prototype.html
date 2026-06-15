@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maniteja - Visual Motion Prototype</title>
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+    
+    <!-- GSAP & ScrollTrigger CDNs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Lenis Smooth Scroll CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.27/bundled/lenis.min.js"></script>
+
+    <style>
+        /* Palette G Custom Variables */
+        :root {
+            --bg: #faf8f5;
+            --text: #111314;
+            --accent: #007190; /* Antwerp Blue/Teal */
+            --muted: #a72144;  /* Vermilion Red */
+            --card-bg: #f0ede8;
+            --font-display: 'DM Serif Display', serif;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+        }
+
+        /* Inverted Custom Cursor */
+        .custom-cursor {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--text);
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 10000;
+            mix-blend-mode: difference;
+            background-color: #fff; /* Difference mix-blend needs light color to invert */
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        @media (pointer: fine) {
+            .custom-cursor {
+                display: block;
+            }
+        }
+
+        /* Controls Panel */
+        .controls-panel {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(240, 237, 232, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 50px;
+            padding: 10px 24px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .controls-panel span {
+            font-size: 12px;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            opacity: 0.6;
+        }
+
+        .controls-panel button {
+            padding: 8px 18px;
+            border: none;
+            background: transparent;
+            color: var(--text);
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .controls-panel button.active {
+            background-color: var(--text);
+            color: var(--bg);
+        }
+
+        .controls-panel button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 60px;
+            pointer-events: none;
+        }
+
+        header * {
+            pointer-events: auto;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Container for overlapping panels */
+        .panel-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        section {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 100px 80px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: var(--bg);
+            will-change: transform;
+        }
+
+        /* Hero Section */
+        #hero-sec {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 60px;
+            align-items: center;
+            z-index: 3;
+        }
+
+        .hero-left {
+            max-width: 680px;
+        }
+
+        .tagline {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--muted);
+            margin-bottom: 25px;
+            display: inline-block;
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: 80px;
+            line-height: 1.05;
+            margin: 0 0 35px 0;
+            font-weight: 400;
+            letter-spacing: -1px;
+        }
+
+        .hero-title span.accent-text {
+            color: var(--accent);
+            font-style: italic;
+        }
+
+        .hero-description {
+            font-size: 19px;
+            line-height: 1.6;
+            opacity: 0.85;
+            margin-bottom: 45px;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            padding: 18px 36px;
+            background-color: var(--text);
+            color: var(--bg);
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .hero-cta:hover {
+            background-color: var(--accent);
+            color: var(--text);
+            transform: translateY(-3px);
+        }
+
+        /* Hero Right (Mock Spline Canvas Container) */
+        .hero-right {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Morphing Spline 3D Blob Mockup */
+        .mock-spline-blob {
+            width: 320px;
+            height: 320px;
+            background: linear-gradient(135deg, var(--accent), var(--muted));
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            animation: morphBlob 10s ease-in-out infinite alternate;
+            filter: blur(10px);
+            opacity: 0.85;
+            box-shadow: inset 0 0 50px rgba(255,255,255,0.4);
+            position: relative;
+        }
+
+        /* Glass layer overlay to look premium */
+        .glass-overlay {
+            position: absolute;
+            width: 340px;
+            height: 340px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.7);
+        }
+
+        @keyframes morphBlob {
+            0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+            50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+            100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+        }
+
+        /* Services Bento Section */
+        #services-sec {
+            z-index: 4;
+            background-color: var(--card-bg);
+            transform: translateY(100vh);
+        }
+
+        .sec-title {
+            font-family: var(--font-display);
+            font-size: 48px;
+            margin: 0 0 35px 0;
+            font-weight: 400;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 30px;
+            width: 100%;
+        }
+
+        .bento-card {
+            background-color: var(--bg);
+            border-radius: 16px;
+            padding: 50px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 350px;
+            transition: border-color 0.3s ease;
+        }
+
+        .bento-card:hover {
+            border-color: var(--accent);
+        }
+
+        .bento-card h3 {
+            font-family: var(--font-display);
+            font-size: 32px;
+            margin: 0 0 20px 0;
+            font-weight: 400;
+        }
+
+        .bento-card p {
+            font-size: 16px;
+            line-height: 1.6;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        /* Projects Section - Blended Layout */
+        #projects-sec {
+            z-index: 5;
+            background-color: #111314;
+            color: #faf8f5;
+            transform: translateY(100vh);
+            display: block;
+            padding: 80px;
+        }
+
+        #projects-sec .sec-title {
+            color: #faf8f5;
+            margin-bottom: 25px;
+        }
+
+        /* BLENDED BENTO-DASHBOARD GRID LAYOUT */
+        .blended-gallery {
+            display: grid;
+            grid-template-columns: 1.1fr 1.9fr;
+            gap: 40px;
+            width: 100%;
+            min-height: 520px;
+        }
+
+        /* Left side: Interactive Bento Cards */
+        .bento-nav-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .bento-nav-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bento-nav-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: var(--accent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .bento-nav-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .bento-nav-card.active {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent);
+            box-shadow: 0 10px 25px rgba(0, 113, 144, 0.15);
+        }
+
+        .bento-nav-card.active::before {
+            opacity: 1;
+        }
+
+        .bento-nav-card h4 {
+            font-family: var(--font-display);
+            font-size: 22px;
+            margin: 0 0 8px 0;
+            font-weight: 400;
+            color: #fff;
+        }
+
+        .bento-nav-card p {
+            font-size: 13px;
+            line-height: 1.4;
+            opacity: 0.7;
+            margin: 0;
+        }
+
+        /* Right side: Real-time n8n simulation workspace */
+        .workspace-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .workspace-canvas {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 1px dashed rgba(255, 255, 255, 0.08);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+        }
+
+        .workspace-canvas .flow-line-active {
+            position: absolute;
+            left: 48px;
+            top: 45px;
+            width: 2px;
+            height: 90px;
+            background-color: var(--accent);
+            z-index: 1;
+        }
+
+        .workspace-canvas .flow-line {
+            position: absolute;
+            left: 48px;
+            top: 45px;
+            width: 2px;
+            height: calc(100% - 90px);
+            background-color: rgba(255,255,255,0.08);
+            z-index: 1;
+        }
+
+        .workspace-node {
+            background: #111314;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            font-family: var(--font-mono);
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .workspace-node.node-active {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(0, 113, 144, 0.25);
+            color: #fff;
+        }
+
+        .workspace-node.node-active .node-icon {
+            color: var(--accent);
+        }
+
+        .node-icon {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        /* Right panel of workspace showing active logs & telemetry */
+        .workspace-meta {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .telemetry-widget {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 20px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+        }
+
+        .telemetry-widget h6 {
+            margin: 0 0 12px 0;
+            color: var(--accent);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .telemetry-metric {
+            font-family: var(--font-display);
+            font-size: 36px;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .telemetry-metric span {
+            font-family: var(--font-sans);
+            font-size: 12px;
+            opacity: 0.5;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .telemetry-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .telemetry-row span.accent-label {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Standard scroll rules override */
+        body.mode-standard .panel-container {
+            height: auto;
+            overflow: visible;
+        }
+
+        body.mode-standard section {
+            position: relative;
+            top: auto;
+            left: auto;
+            transform: none !important;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="mode-stack">
+
+    <!-- Custom Cursor -->
+    <div class="custom-cursor"></div>
+
+    <header>
+        <div class="logo">MANITEJA</div>
+        <div class="nav-links">
+            <a href="#">Works</a>
+            <a href="#">Services</a>
+            <a href="#">Contact</a>
+        </div>
+    </header>
+
+    <!-- Controls to Switch Modes Lively -->
+    <div class="controls-panel">
+        <span>Transition Mode:</span>
+        <button id="btn-stack" class="active" onclick="switchMode('stack')">Overlapping Stack (Artem)</button>
+        <button id="btn-standard" onclick="switchMode('standard')">Standard Flow Scroll</button>
+    </div>
+
+    <!-- Wrapper that contains the sections -->
+    <div class="panel-container">
+        
+        <!-- Hero Section -->
+        <section id="hero-sec">
+            <div class="hero-left">
+                <span class="tagline">AI Agency & Custom Workflows</span>
+                <h1 class="hero-title" id="split-title">Architect of <span class="accent-text">workflows</span>, designer of interfaces.</h1>
+                <p class="hero-description">
+                    I mix custom AI automation with premium UI/UX design. Fusing search engines and LLM query models (SEO/GEO) to ensure your business stands out and executes instantly.
+                </p>
+                <a href="#" class="hero-cta">Initialize Project</a>
+            </div>
+            
+            <div class="hero-right">
+                <div class="mock-spline-blob"></div>
+                <div class="glass-overlay">Spline 3D Embed</div>
+            </div>
+        </section>
+
+        <!-- Services Bento Section -->
+        <section id="services-sec">
+            <h2 class="sec-title">Capabilities</h2>
+            <div class="bento-grid">
+                <div class="bento-card">
+                    <div>
+                        <h3>AI Workflows & Automations</h3>
+                        <p>We build autonomous multi-agent pipelines and n8n workflow systems that replace manual data entries, client onboarding, and CRM synchronization.</p>
+                    </div>
+                    <span style="font-family: var(--font-mono); font-size: 12px; color: var(--accent);">Active Integration</span>
+                </div>
+                <div class="bento-card" style="background-color: var(--text); color: var(--bg);">
+                    <div>
+                        <h3 style="color: var(--bg);">Website Creation & UI/UX</h3>
+                        <p>High-contrast editorial layouts with fluid scroll triggers and custom animations that keep users engaged and convert leads.</p>
+                    </div>
+                    <span style="font-family: var(--font-mono); font-size: 12px; color: var(--accent);">Vite + GSAP + Lenis</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section - Blended Bento Dashboard -->
+        <section id="projects-sec">
+            <h2 class="sec-title">Interactive Workflow Gallery</h2>
+            <p style="opacity: 0.6; margin: 0 0 35px 0; font-size: 15px;">
+                Select any Bento Card on the left to simulate the live n8n workflow execution on the workspace canvas.
+            </p>
+            
+            <div class="blended-gallery">
+                
+                <!-- Left Column: Bento Navigation Cards -->
+                <div class="bento-nav-stack">
+                    
+                    <div class="bento-nav-card active" onclick="selectWorkflow('lead', this)">
+                        <h4>Lead Router Agent</h4>
+                        <p>Webhook ➔ Airtable ➔ Slack</p>
+                        <p style="font-size: 11px; opacity: 0.5; margin-top: 10px;">Routes incoming form leads, logs details, and alerts reps.</p>
+                    </div>
+
+                    <div class="bento-nav-card" onclick="selectWorkflow('content', this)">
+                        <h4>AI Content Engine</h4>
+                        <p>Webhook ➔ Gemini ➔ Webflow</p>
+                        <p style="font-size: 11px; opacity: 0.5; margin-top: 10px;">Scrapes RSS feeds, generates draft articles, and publishes.</p>
+                    </div>
+
+                    <div class="bento-nav-card" onclick="selectWorkflow('geo', this)">
+                        <h4>SEO & GEO Monitor</h4>
+                        <p>Cron ➔ Serper ➔ Telegram</p>
+                        <p style="font-size: 11px; opacity: 0.5; margin-top: 10px;">Tracks rankings and LLM citation counts in real time.</p>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: Central SaaS Dashboard Simulation -->
+                <div class="workspace-panel">
+                    
+                    <!-- n8n Node Map Canvas -->
+                    <div class="workspace-canvas">
+                        <div class="flow-line"></div>
+                        <div class="flow-line-active"></div>
+                        
+                        <div class="workspace-node node-active" id="node-trigger">
+                            <span>Webhook: New Lead Form</span>
+                            <span class="node-icon">⚡</span>
+                        </div>
+                        <div class="workspace-node" id="node-logic">
+                            <span>Airtable: Log Lead Entry</span>
+                            <span class="node-icon">⚙️</span>
+                        </div>
+                        <div class="workspace-node" id="node-action">
+                            <span>Slack: Alert Sales Agent</span>
+                            <span class="node-icon">💬</span>
+                        </div>
+                    </div>
+
+                    <!-- Telemetry Metrics & Details Panel -->
+                    <div class="workspace-meta">
+                        <div class="telemetry-widget" style="margin-bottom: 20px;">
+                            <h6>Weekly Operational Impact</h6>
+                            <div class="telemetry-metric" id="metric-hours">15 Hours<span>Saved per client</span></div>
+                        </div>
+
+                        <div class="telemetry-widget">
+                            <h6>Telemetry Logs</h6>
+                            <div class="telemetry-row">
+                                <span>Status</span>
+                                <span class="accent-label">ONLINE</span>
+                            </div>
+                            <div class="telemetry-row">
+                                <span>Success Rate</span>
+                                <span style="color: #fff;">99.98%</span>
+                            </div>
+                            <div class="telemetry-row">
+                                <span>Avg. Latency</span>
+                                <span style="color: #fff;" id="metric-latency">340ms</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Initialize Lenis Smooth Scroll
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smoothWheel: true
+        });
+
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // Custom Cursor movement tracking
+        const cursor = document.querySelector('.custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, {
+                x: e.clientX,
+                y: e.clientY,
+                duration: 0.1,
+                ease: 'power2.out'
+            });
+        });
+
+        // Register ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Split text character fade-in (Qiao Li style)
+        const titleElement = document.getElementById('split-title');
+        const textContent = titleElement.innerText;
+        titleElement.innerHTML = '';
+        textContent.split('').forEach(char => {
+            const span = document.createElement('span');
+            span.innerText = char;
+            span.style.opacity = '0';
+            span.style.display = char === ' ' ? 'inline' : 'inline-block';
+            titleElement.appendChild(span);
+        });
+
+        // Animate the split letters in
+        gsap.to('#split-title span', {
+            opacity: 1,
+            duration: 0.05,
+            stagger: 0.02,
+            ease: 'power1.out',
+            delay: 0.5
+        });
+
+        let mainTimeline = null;
+        let standAloneTriggers = [];
+
+        function initAnimations(mode) {
+            // Kill everything first
+            if (mainTimeline) {
+                mainTimeline.scrollTrigger.kill();
+                mainTimeline.kill();
+                mainTimeline = null;
+            }
+            standAloneTriggers.forEach(t => t.kill());
+            standAloneTriggers = [];
+            ScrollTrigger.clearScrollMemory();
+            
+            // Reset transforms
+            gsap.set("#services-sec, #projects-sec", { clearProps: "all" });
+
+            if (mode === 'stack') {
+                document.body.className = 'mode-stack';
+                
+                mainTimeline = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: ".panel-container",
+                        pin: true,
+                        start: "top top",
+                        end: "+=200%",
+                        scrub: 1,
+                        invalidateOnRefresh: true
+                    }
+                });
+
+                mainTimeline.to("#services-sec", {
+                    y: "0%",
+                    ease: "none"
+                })
+                .to("#projects-sec", {
+                    y: "0%",
+                    ease: "none"
+                });
+
+            } else {
+                document.body.className = 'mode-standard';
+                
+                const t1 = gsap.from("#services-sec .bento-card", {
+                    scrollTrigger: {
+                        trigger: "#services-sec",
+                        start: "top 75%",
+                        toggleActions: "play none none reverse"
+                    },
+                    y: 60,
+                    opacity: 0,
+                    duration: 0.8,
+                    stagger: 0.2,
+                    ease: "power2.out"
+                });
+
+                const t2 = gsap.from("#projects-sec .blended-gallery", {
+                    scrollTrigger: {
+                        trigger: "#projects-sec",
+                        start: "top 75%",
+                        toggleActions: "play none none reverse"
+                    },
+                    y: 40,
+                    opacity: 0,
+                    duration: 0.6,
+                    ease: "power2.out"
+                });
+
+                standAloneTriggers.push(t1.scrollTrigger, t2.scrollTrigger);
+            }
+            
+            ScrollTrigger.refresh();
+        }
+
+        function switchMode(mode) {
+            document.querySelectorAll('.controls-panel > button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-' + mode).classList.add('active');
+            
+            switchModeStyles(mode);
+            initAnimations(mode);
+            lenis.scrollTo(0, { immediate: true });
+        }
+
+        function switchModeStyles(mode) {
+            const container = document.querySelector('.panel-container');
+            if (mode === 'stack') {
+                container.style.position = 'relative';
+                container.style.height = '100vh';
+                container.style.overflow = 'hidden';
+                document.querySelectorAll('section').forEach(s => {
+                    s.style.position = 'absolute';
+                    s.style.top = '0';
+                    s.style.left = '0';
+                });
+                gsap.set("#services-sec", { y: "100vh" });
+                gsap.set("#projects-sec", { y: "100vh" });
+            } else {
+                container.style.position = 'relative';
+                container.style.height = 'auto';
+                container.style.overflow = 'visible';
+                document.querySelectorAll('section').forEach(s => {
+                    s.style.position = 'relative';
+                    s.style.top = 'auto';
+                    s.style.left = 'auto';
+                });
+            }
+        }
+
+        // Blended Gallery Workflow Selection Data
+        const galleryData = {
+            lead: {
+                nodes: ['Webhook: New Lead Form', 'Airtable: Log Lead Entry', 'Slack: Alert Sales Agent'],
+                icons: ['⚡', '⚙️', '💬'],
+                hours: '15 Hours',
+                latency: '340ms'
+            },
+            content: {
+                nodes: ['RSS: Fetch Industry News', 'Gemini: Craft Draft Copy', 'Webflow: Publish News Draft'],
+                icons: ['📰', '🤖', '🚀'],
+                hours: '25 Hours',
+                latency: '1420ms'
+            },
+            geo: {
+                nodes: ['Schedule: Nightly Audit', 'Serper: Fetch Search Results', 'Telegram: Send SEO/GEO Alert'],
+                icons: ['⏰', '🔍', '📤'],
+                hours: '10 Hours',
+                latency: '580ms'
+            }
+        };
+
+        function selectWorkflow(key, cardElement) {
+            // Remove active class from all bento nav cards
+            document.querySelectorAll('.bento-nav-card').forEach(card => card.classList.remove('active'));
+            cardElement.classList.add('active');
+
+            const data = galleryData[key];
+
+            // Animate transition using GSAP
+            gsap.to('.workspace-node', {
+                opacity: 0,
+                x: -20,
+                duration: 0.2,
+                stagger: 0.05,
+                onComplete: () => {
+                    // Update content
+                    document.getElementById('node-trigger').innerHTML = `<span>${data.nodes[0]}</span><span class="node-icon">${data.icons[0]}</span>`;
+                    document.getElementById('node-logic').innerHTML = `<span>${data.nodes[1]}</span><span class="node-icon">${data.icons[1]}</span>`;
+                    document.getElementById('node-action').innerHTML = `<span>${data.nodes[2]}</span><span class="node-icon">${data.icons[2]}</span>`;
+                    
+                    document.getElementById('metric-hours').firstChild.textContent = data.hours;
+                    document.getElementById('metric-latency').innerText = data.latency;
+
+                    // Animate back in
+                    gsap.to('.workspace-node', {
+                        opacity: 1,
+                        x: 0,
+                        duration: 0.3,
+                        stagger: 0.08,
+                        ease: "power2.out"
+                    });
+                }
+            });
+        }
+
+        // Initial launch
+        switchModeStyles('stack');
+        initAnimations('stack');
+    </script>
+</body>
+</html>
