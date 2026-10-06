@@ -379,9 +379,9 @@
                     <div class="breakdown-grid">
                         <div class="breakdown-col">
                             <div class="col-num">01</div>
-                            <h4 class="col-title">Friction & Problem</h4>
+                            <h4 class="col-title">Motive & Friction</h4>
                             <p class="col-text">
-                                Autonomous coding agents degrade rapidly over long trajectories. Tool outputs and exploratory reads clutter the context window, causing memory drift, hallucinated invariants, and catastrophic silent regressions after 5–10 steps.
+                                "When you let an AI coding agent work on a repository for more than thirty minutes, it gets sloppy. Terminal output and exploratory reads fill up its context window. By step ten, it starts hallucinating, forgetting its instructions, and breaking code that already worked. One giant agent session cannot handle a whole backlog."
                             </p>
                         </div>
 
@@ -389,7 +389,7 @@
                             <div class="col-num">02</div>
                             <h4 class="col-title">What I Built</h4>
                             <p class="col-text">
-                                An autonomous orchestrator enforcing the "Baton Pass" paradigm: sequential, isolated single-issue worker lifecycles with strict context wiping, deterministic git checkpoints, and automated CI test verification gates before passing the baton to the next agent.
+                                "A CLI orchestrator that runs backlog work like a relay race. Instead of keeping one agent alive forever, it launches a fresh worker process for a single GitHub issue. The worker starts with an empty context window, edits the code, runs the test suite, opens a PR if tests pass, and exits. Then it hands a small summary baton to the next worker."
                             </p>
                         </div>
 
@@ -397,7 +397,7 @@
                             <div class="col-num">03</div>
                             <h4 class="col-title">The Hardest Part</h4>
                             <p class="col-text">
-                                Building state handoffs that transfer pure semantic signal without dragging noisy debug logs across agent turns. Solved with serialized structured manifests and automated rollbacks on CI test failure.
+                                "Figuring out what belongs in the baton handoff. If you pass full terminal logs, the next agent gets distracted by the noise. If you pass too little, it loses context. I had to design a minimal handoff format and set up strict test gates so failed runs get rolled back before the next agent touches the repo."
                             </p>
                         </div>
 
@@ -406,12 +406,12 @@
                             <h4 class="col-title">Proof & Impact</h4>
                             <div class="proof-stats">
                                 <div class="proof-stat">
-                                    <span class="p-num">0%</span>
-                                    <span class="p-label">Context rot across 20+ steps</span>
+                                    <span class="p-num">0 Rot</span>
+                                    <span class="p-label">Clean context on every issue</span>
                                 </div>
                                 <div class="proof-stat">
-                                    <span class="p-num">100%</span>
-                                    <span class="p-label">CI gate enforcement on commit</span>
+                                    <span class="p-num">17 Suites</span>
+                                    <span class="p-label">Full unit and packaging tests</span>
                                 </div>
                             </div>
                             <div class="proof-links">
