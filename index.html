@@ -443,39 +443,39 @@
                     <div class="breakdown-grid">
                         <div class="breakdown-col">
                             <div class="col-num">01</div>
-                            <h4 class="col-title">Friction & Problem</h4>
+                            <h4 class="col-title">How It Started</h4>
                             <p class="col-text">
-                                Video pipelines produce massive data redundancy. AI video editing tools often choke on raw frame streams, spending compute on static backgrounds or near-identical consecutive frames while introducing latency and memory spikes.
+                                "This was the predecessor to my video editing harness. I realized that if I could give AI agents reusable skills for asset selection, pacing, and layout, they could learn how to edit videos by extracting patterns directly from reference footage."
                             </p>
                         </div>
 
                         <div class="breakdown-col">
                             <div class="col-num">02</div>
-                            <h4 class="col-title">What I Built</h4>
+                            <h4 class="col-title">The Extraction Pipeline</h4>
                             <p class="col-text">
-                                A high-efficiency video extraction pipeline incorporating difference-hashing (dHash) for perceptual visual deduplication, backed by Sloprail: an input/output data contract suite filtering noise before multimodal ingestion.
+                                "To analyze videos in a token-efficient way, I built a pipeline where you pass 10 to 30 reference videos. It runs preprocessing, passes them through a series of AI agents, runs rubric formatting, and extracts structured skill contracts from the video patterns."
                             </p>
                         </div>
 
                         <div class="breakdown-col">
                             <div class="col-num">03</div>
-                            <h4 class="col-title">The Hardest Part</h4>
+                            <h4 class="col-title">The Real-World Result</h4>
                             <p class="col-text">
-                                Calibrating Hamming distance thresholds on dHash matrices to distinguish between genuine visual changes (cut, zoom, overlay) and video compression artifacts without dropping subtle UI state transitions.
+                                "I tested it on around 40 reference videos. It extracted 7 distinct, reusable video-editing skills that I still use today to guide agent editing runs."
                             </p>
                         </div>
 
                         <div class="breakdown-col">
                             <div class="col-num">04</div>
-                            <h4 class="col-title">Proof & Impact</h4>
+                            <h4 class="col-title">Proof & Repositories</h4>
                             <div class="proof-stats">
                                 <div class="proof-stat">
-                                    <span class="p-num">92%</span>
-                                    <span class="p-label">Frame redundancy eliminated</span>
+                                    <span class="p-num">40 Videos</span>
+                                    <span class="p-label">Processed through pipeline</span>
                                 </div>
                                 <div class="proof-stat">
-                                    <span class="p-num">4.2x</span>
-                                    <span class="p-label">Downstream agent ingestion speedup</span>
+                                    <span class="p-num">7 Skills</span>
+                                    <span class="p-label">Extracted and used daily</span>
                                 </div>
                             </div>
                             <div class="proof-links">
