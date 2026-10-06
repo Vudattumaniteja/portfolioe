@@ -64,7 +64,7 @@
             <nav class="header-nav">
                 <a href="#flagships" class="nav-link">Flagships</a>
                 <a href="#systems" class="nav-link">Deep Systems</a>
-                <a href="#principles" class="nav-link">Principles</a>
+                <a href="#research" class="nav-link">Research</a>
                 <div class="nav-socials">
                     <a href="https://github.com/Vudattumaniteja" target="_blank" rel="noopener noreferrer" class="social-link" title="GitHub">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -590,55 +590,83 @@
             </div>
         </section>
 
-        <!-- Engineering Principles (UX, DX, AX, EX) -->
-        <section id="principles" class="section principles-section">
+        <!-- 03 / Research & Papers (E-VRAG-G) -->
+        <section id="research" class="section research-section">
+            <span id="principles" style="display:none;" aria-hidden="true"></span>
             <div class="section-header">
-                <div class="section-tag mono-label">03 / CORE PHILOSOPHY</div>
-                <h2 class="section-title">The Four Dimensions of Systems Quality</h2>
-                <p class="section-desc">Software is only as good as its weakest surface. Every system I build is evaluated against four strict disciplines.</p>
+                <div class="section-tag mono-label">03 / RESEARCH & PAPERS</div>
+                <h2 class="section-title">Empirical Research & Methodology</h2>
+                <p class="section-desc">Advancing multimodal retrieval through rigorous empirical evaluation, training-free grounding mechanisms, and reproducible ablations.</p>
             </div>
 
-            <div class="principles-grid">
-                <div class="principle-card">
-                    <div class="principle-header">
-                        <span class="principle-badge">UX</span>
-                        <h3 class="principle-name">User Experience</h3>
+            <article class="flagship-card" id="paper-evrag-grounded">
+                <div class="card-header-bar">
+                    <div class="card-title-group">
+                        <span class="project-num">RESEARCH PAPER • EXTENSION ARCHITECTURE</span>
+                        <h3 class="project-name">E-VRAG-G: Grounded Query Decomposition for Long Video RAG</h3>
+                        <span class="project-tagline">Extension to E-VRAG (Xu et al., 2025, arXiv:2508.01546v1)</span>
                     </div>
-                    <p class="principle-desc">
-                        Zero unnecessary friction. Instant feedback, tactile interactions, and radical clarity. If the user has to guess what happened, the system has failed.
-                    </p>
+                    <div class="card-badges">
+                        <span class="tech-badge accent-badge">arXiv Extension</span>
+                        <span class="tech-badge">DINOv2 ViT-B/14</span>
+                        <span class="tech-badge">ITS Clustering</span>
+                        <span class="tech-badge">Moondream 0.5B</span>
+                        <span class="tech-badge">LLaVA-Video 7B</span>
+                        <span class="tech-badge">Long Video RAG</span>
+                    </div>
                 </div>
 
-                <div class="principle-card">
-                    <div class="principle-header">
-                        <span class="principle-badge">DX</span>
-                        <h3 class="principle-name">Developer Experience</h3>
+                <div class="breakdown-grid">
+                    <div class="breakdown-col">
+                        <div class="col-num">01</div>
+                        <h4 class="col-title">The Problem: Caption-Imagination Gap</h4>
+                        <p class="col-text">
+                            In standard E-VRAG, decomposed query captions are synthesized purely from the raw text query without inspecting video content: <em>C<sub>H</sub></em> = <em>P<sub>H</sub></em>(<em>Q</em>). For complex or implicit queries, the LLM is forced to "imagine" visual vocabulary, triggering severe semantic mismatches and retrieval failure during coarse pre-filtering.
+                        </p>
                     </div>
-                    <p class="principle-desc">
-                        Local-first tooling, strict TypeScript definitions, reproducible builds, and deterministic test suites. Clean codebases that invite modification rather than fear.
-                    </p>
-                </div>
 
-                <div class="principle-card">
-                    <div class="principle-header">
-                        <span class="principle-badge">AX</span>
-                        <h3 class="principle-name">Agent Experience</h3>
+                    <div class="breakdown-col">
+                        <div class="col-num">02</div>
+                        <h4 class="col-title">What I Built: Grounded Decomposition</h4>
+                        <p class="col-text">
+                            Grounded decomposition using DINOv2 visual clustering, ITS distinctive frame selection, and Moondream 0.5B to build an offline visual inventory <em>V<sub>g</sub></em> that constrains query captions to what is actually in the video: <em>C<sub>H</sub></em> = <em>P<sub>H</sub></em>(<em>Q</em>, <em>V<sub>g</sub></em>). Drop-in design: online retrieval and multi-view QA are completely untouched.
+                        </p>
                     </div>
-                    <p class="principle-desc">
-                        Deep context hygiene for autonomous AI agents. Elimination of tool noise, clean structured I/O contracts, and sequential worker lifecycles to prevent attention degradation.
-                    </p>
-                </div>
 
-                <div class="principle-card">
-                    <div class="principle-header">
-                        <span class="principle-badge">EX</span>
-                        <h3 class="principle-name">Execution Experience</h3>
+                    <div class="breakdown-col">
+                        <div class="col-num">03</div>
+                        <h4 class="col-title">Measured Benchmark Results</h4>
+                        <p class="col-text">
+                            Empirically validated across four primary long-video benchmarks (Video-MME: 65.5, MLVU: 70.4, NextQA: 84.4). Achieved <strong>LVB 64.2 (+0.8 over blind baseline)</strong> with exactly <strong>0 per-query runtime cost</strong> by amortizing the visual inventory offline during video indexing.
+                        </p>
                     </div>
-                    <p class="principle-desc">
-                        Blazing startup speed, sub-millisecond latencies, clear error diagnostics, graceful teardowns, and zero resource leaks. Systems that respect hardware resources.
-                    </p>
+
+                    <div class="breakdown-col">
+                        <div class="col-num">04</div>
+                        <h4 class="col-title">Reproduction & Repository</h4>
+                        <div class="proof-stats">
+                            <div class="proof-stat">
+                                <span class="p-num">LVB 64.2</span>
+                                <span class="p-label">+0.8 Δ vs Blind Baseline</span>
+                            </div>
+                            <div class="proof-stat">
+                                <span class="p-num">0 TFLOPs</span>
+                                <span class="p-label">Per-query runtime overhead</span>
+                            </div>
+                        </div>
+                        <div class="proof-links">
+                            <a href="https://github.com/Vudattumaniteja/e-vrag-grounded" target="_blank" rel="noopener noreferrer" class="code-btn">
+                                <span>Research Repository</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                            </a>
+                            <a href="https://arxiv.org/abs/2508.01546" target="_blank" rel="noopener noreferrer" class="code-btn">
+                                <span>Original Paper (arXiv:2508.01546v1)</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </article>
         </section>
 
         <!-- Personal Philosophy / The Academy Manifesto -->
