@@ -35,7 +35,21 @@
     }
     </script>
 </head>
-<body class="editorial-nocturne">
+<body class="editorial-nocturne gate-locked">
+
+    <!-- Password Access Gate -->
+    <div id="password-gate" class="password-gate-overlay">
+        <div class="password-card">
+            <div class="gate-tag mono-label">CONFIDENTIAL DOSSIER</div>
+            <h2 class="gate-title">Restricted Access</h2>
+            <p class="gate-desc">This candidate portfolio is protected. Enter the access passcode to view.</p>
+            <form id="gate-form" class="gate-form">
+                <input type="password" id="gate-input" class="gate-input" placeholder="Enter passcode" autofocus autocomplete="off" required />
+                <button type="submit" class="gate-btn">Unlock</button>
+            </form>
+            <p id="gate-error" class="gate-error" style="display: none;">Incorrect passcode. Please try again.</p>
+        </div>
+    </div>
 
     <!-- Atmospheric Grid & Grain -->
     <div class="ambient-glow glow-top" aria-hidden="true"></div>
